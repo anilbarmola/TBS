@@ -1,178 +1,180 @@
-// Tailwind CSS configuration for custom colors and font family
-// (moved from <head>)
-tailwind.config = {
-  theme: {
-    extend: {
-      colors: {
-        'primary-green': '#1AB773',
-        'light-green': '#E8F5EE',
-        'dark-text': '#1F2937',
-        'gray-text': '#4B5563',
-        'light-gray-bg': '#F9FAFB',
-        'peach-bg': '#FDF4EC',
-        'peach-text': '#D98218',
-        'orange-btn': '#F59E0B',
-      },
-      fontFamily: {
-        inter: ['Inter', 'sans-serif'],
-      },
-    }
+﻿(function () {
+  const yearEl = document.getElementById('year');
+  if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+  const progressBar = document.getElementById('scrollProgress');
+  if (progressBar) {
+    window.addEventListener('scroll', () => {
+      const docHeight = document.body.scrollHeight - window.innerHeight;
+      progressBar.style.width = docHeight > 0 ? (window.scrollY / docHeight) * 100 + '%' : '0%';
+    }, { passive: true });
   }
-};
 
-// ---------- Video language & player modals (moved from Hero section) ----------
-const playButton = document.getElementById("playButton");
-const languageModal = document.getElementById("languageModal");
-const closeLanguageModal = document.getElementById("closeLanguageModal");
-
-const videoModal = document.getElementById("videoModal");
-const closeModal = document.getElementById("closeModal");
-const youtubeVideo = document.getElementById("youtubeVideo");
-
-const hindiVideoBtn = document.getElementById("hindiVideo");
-const englishVideoBtn = document.getElementById("englishVideo");
-
-const hindiUrl = "https://www.youtube.com/embed/ILr__iSoUmg?autoplay=1";
-const englishUrl = "https://www.youtube.com/embed/fMnxZTTXzfQ?autoplay=1";
-
-// Open language selection
-if (playButton) {
-  playButton.addEventListener("click", () => {
-    languageModal.classList.remove("hidden");
-  });
-}
-
-// Close language modal
-if (closeLanguageModal) {
-  closeLanguageModal.addEventListener("click", () => {
-    languageModal.classList.add("hidden");
-  });
-}
-
-// When user picks Hindi
-if (hindiVideoBtn) {
-  hindiVideoBtn.addEventListener("click", () => {
-    languageModal.classList.add("hidden");
-    videoModal.classList.remove("hidden");
-    youtubeVideo.src = hindiUrl;
-  });
-}
-
-// When user picks English
-if (englishVideoBtn) {
-  englishVideoBtn.addEventListener("click", () => {
-    languageModal.classList.add("hidden");
-    videoModal.classList.remove("hidden");
-    youtubeVideo.src = englishUrl;
-  });
-}
-
-// Close video modal
-if (closeModal) {
-  closeModal.addEventListener("click", () => {
-    videoModal.classList.add("hidden");
-    youtubeVideo.src = "";
-  });
-}
-
-// Close on background click
-window.addEventListener("click", (e) => {
-  if (e.target === videoModal) {
-    videoModal.classList.add("hidden");
-    youtubeVideo.src = "";
-  }
-  if (e.target === languageModal) {
-    languageModal.classList.add("hidden");
-  }
-});
-
-// ---------- Slider controls (moved from Modules section) ----------
-function scrollSlider(amount) {
-  document.getElementById('slider').scrollBy({ left: amount, behavior: 'smooth' });
-}
-window.scrollSlider = scrollSlider;
-
-// ---------- Book Demo Form – FormSubmit (moved from Book a Demo section) ----------
-function showThankYouMessage(event) {
-  event.preventDefault(); // prevent default submit
-
-  const form = event.target;
-  const statusDiv = document.getElementById('form-status');
-
-  // Submit via FormSubmit
-  fetch(form.action, {
-    method: "POST",
-    body: new FormData(form)
-  }).then(response => {
-    if (response.ok) {
-      statusDiv.classList.remove("hidden");
-      form.reset();
-    } else {
-      statusDiv.innerHTML = "❌ Something went wrong, please try again.";
-      statusDiv.classList.remove("hidden");
-    }
-  }).catch(error => {
-    statusDiv.innerHTML = "❌ Error: " + error.message;
-    statusDiv.classList.remove("hidden");
-  });
-}
-window.showThankYouMessage = showThankYouMessage;
-
-// ---------- Footer year (moved from footer) ----------
-document.getElementById("year").textContent = new Date().getFullYear();
-
-// ---------- FAQ accordion + additional demo-form handler (moved from bottom) ----------
-document.addEventListener('DOMContentLoaded', () => {
-  // FAQ Accordion
-  const accordionItems = document.querySelectorAll('.accordion-item');
-  accordionItems.forEach(item => {
-    item.addEventListener('click', () => {
-      const content = item.querySelector('.accordion-content');
-      const isActive = item.classList.contains('active');
-      accordionItems.forEach(otherItem => {
-        if (otherItem !== item && otherItem.classList.contains('active')) {
-          otherItem.classList.remove('active');
-          otherItem.querySelector('.accordion-content').style.display = 'none';
-        }
+  const menuToggle = document.getElementById('menuToggle');
+  const mobileMenu = document.getElementById('mobileMenu');
+  if (menuToggle && mobileMenu) {
+    menuToggle.addEventListener('click', () => {
+      const open = mobileMenu.classList.toggle('open');
+      menuToggle.setAttribute('aria-expanded', String(open));
+      menuToggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    });
+    mobileMenu.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.remove('open');
+        menuToggle.setAttribute('aria-expanded', 'false');
+        menuToggle.setAttribute('aria-label', 'Open menu');
       });
-      if (isActive) {
-        item.classList.remove('active');
-        content.style.display = 'none';
-      } else {
+    });
+  }
+
+  document.querySelectorAll('.faq-item').forEach((item, index) => {
+    const trigger = item.querySelector('.faq-trigger');
+    const panel = item.querySelector('.faq-panel');
+    if (!trigger || !panel) return;
+
+    if (index === 0) {
+      item.classList.add('active');
+      panel.hidden = false;
+    } else {
+      panel.hidden = true;
+    }
+
+    trigger.addEventListener('click', () => {
+      const isActive = item.classList.contains('active');
+      document.querySelectorAll('.faq-item').forEach((other) => {
+        other.classList.remove('active');
+        const otherPanel = other.querySelector('.faq-panel');
+        if (otherPanel) otherPanel.hidden = true;
+      });
+      if (!isActive) {
         item.classList.add('active');
-        content.style.display = 'block';
+        panel.hidden = false;
       }
     });
   });
 
-  // Demo Form Submission
-  const form = document.getElementById('demo-form');
-  const statusDiv = document.getElementById('form-status');
-  
-  if (form) {
-    form.addEventListener('submit', function(event) {
-      event.preventDefault();
-      
-      statusDiv.classList.remove('hidden');
-      statusDiv.innerHTML = '<span class="text-gray-700">Sending your request...</span>';
-      
-      // Collect form data
-      const formData = new FormData(form);
-      const data = {
-        name: formData.get('name'),
-        email: formData.get('email'),
-        contact: formData.get('contact'),
-        company: formData.get('company'),
-        message: formData.get('message')
-      };
+  const track = document.getElementById('testimonialTrack');
+  const dots = Array.from(document.querySelectorAll('[data-testimonial-dot]'));
+  const cards = track ? Array.from(track.children) : [];
+  let testimonialIndex = 1;
 
-      // For security reasons, we can't directly send to an email address from the client side.
-      // The form is set up to show a success message upon submission, as a real implementation
-      // would require a server-side endpoint to handle the email sending process.
-      setTimeout(() => {
-        statusDiv.innerHTML = '<span class="text-primary-green font-semibold">Thank you for your submission! We will be in touch shortly.</span>';
-        form.reset(); // Clear the form fields
-      }, 2000);
+  function updateTestimonials() {
+    if (!track || !cards.length) return;
+    cards.forEach((card, i) => {
+      card.classList.toggle('is-active', i === testimonialIndex);
+    });
+    dots.forEach((dot, i) => {
+      dot.classList.toggle('is-active', i === testimonialIndex);
     });
   }
-});
+
+  function goTestimonial(dir) {
+    if (!cards.length) return;
+    testimonialIndex = (testimonialIndex + dir + cards.length) % cards.length;
+    updateTestimonials();
+  }
+
+  const prevBtn = document.getElementById('testimonialPrev');
+  const nextBtn = document.getElementById('testimonialNext');
+  if (prevBtn) prevBtn.addEventListener('click', () => goTestimonial(-1));
+  if (nextBtn) nextBtn.addEventListener('click', () => goTestimonial(1));
+  dots.forEach((dot, i) => {
+    dot.addEventListener('click', () => {
+      testimonialIndex = i;
+      updateTestimonials();
+    });
+  });
+  updateTestimonials();
+
+  const form = document.getElementById('demo-form');
+  const statusDiv = document.getElementById('form-status');
+  if (form && statusDiv) {
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      statusDiv.hidden = false;
+      statusDiv.className = 'form-status is-pending';
+      statusDiv.textContent = 'Sending your request...';
+
+      fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form)
+      }).then((response) => {
+        if (response.ok) {
+          statusDiv.className = 'form-status is-ok';
+          statusDiv.textContent = 'Thank you. We will be in touch shortly.';
+          form.reset();
+        } else {
+          statusDiv.className = 'form-status is-error';
+          statusDiv.textContent = 'Something went wrong. Please try again or email info@transcendtech.in.';
+        }
+      }).catch(() => {
+        statusDiv.className = 'form-status is-error';
+        statusDiv.textContent = 'Something went wrong. Please try again or email info@transcendtech.in.';
+      });
+    });
+  }
+
+  const languageModal = document.getElementById('languageModal');
+  const videoModal = document.getElementById('videoModal');
+  const youtubeVideo = document.getElementById('youtubeVideo');
+  const hindiUrl = 'https://www.youtube.com/embed/ILr__iSoUmg?autoplay=1';
+  const englishUrl = 'https://www.youtube.com/embed/fMnxZTTXzfQ?autoplay=1';
+
+  function openLanguageModal() {
+    if (languageModal) languageModal.hidden = false;
+  }
+
+  function closeLanguageModal() {
+    if (languageModal) languageModal.hidden = true;
+  }
+
+  function closeVideoModal() {
+    if (videoModal) videoModal.hidden = true;
+    if (youtubeVideo) youtubeVideo.src = '';
+  }
+
+  function openVideo(url) {
+    closeLanguageModal();
+    if (videoModal) videoModal.hidden = false;
+    if (youtubeVideo) youtubeVideo.src = url;
+  }
+
+  document.querySelectorAll('[data-open-demo]').forEach((btn) => {
+    btn.addEventListener('click', (event) => {
+      event.preventDefault();
+      openLanguageModal();
+    });
+  });
+
+  const closeLanguage = document.getElementById('closeLanguageModal');
+  const closeModal = document.getElementById('closeModal');
+  const hindiVideoBtn = document.getElementById('hindiVideo');
+  const englishVideoBtn = document.getElementById('englishVideo');
+
+  if (closeLanguage) closeLanguage.addEventListener('click', closeLanguageModal);
+  if (closeModal) closeModal.addEventListener('click', closeVideoModal);
+  if (hindiVideoBtn) hindiVideoBtn.addEventListener('click', () => openVideo(hindiUrl));
+  if (englishVideoBtn) englishVideoBtn.addEventListener('click', () => openVideo(englishUrl));
+
+  const toTop = document.getElementById('toTop');
+  if (toTop) {
+    const syncToTop = () => {
+      toTop.style.display = window.scrollY > 480 ? 'grid' : 'none';
+    };
+    toTop.style.display = 'none';
+    window.addEventListener('scroll', syncToTop, { passive: true });
+    toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  }
+
+  window.addEventListener('click', (event) => {
+    if (event.target === videoModal) closeVideoModal();
+    if (event.target === languageModal) closeLanguageModal();
+  });
+
+  window.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      closeVideoModal();
+      closeLanguageModal();
+    }
+  });
+})();
